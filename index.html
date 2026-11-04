@@ -149,7 +149,7 @@ footer{padding:30px 0 50px;text-align:center;font-size:12px;color:var(--muted)}
   <h2>the <i>product</i></h2>
   <p class="lead">Link Watermelon Sour Jacks in your videos.</p>
   <div class="prod">
-    <div class="img"><img src="bag.png" alt="Watermelon Sour Jacks 24 pack" onerror="this.remove();this.parentNode.textContent='🍉'"></div>
+    <div class="img"><img src="bag.png" alt="Watermelon Sour Jacks 24 pack" onerror="var p=this.parentNode;p.textContent='🍉'"></div>
     <div>
       <span class="pill">Watermelon Sour Jacks</span>
       <ul><li>24 × 2oz bags</li><li>Fat free &amp; gluten free</li><li>Less than $2 per bag</li><li>GMO free</li><li>Colorful &amp; zesty</li><li>3 delicious layers, one wedge</li></ul>
@@ -181,13 +181,11 @@ footer{padding:30px 0 50px;text-align:center;font-size:12px;color:var(--muted)}
 
 <script>
 /* ============ EDIT THESE EACH UPDATE ============ */
-const LAST_UPDATED = "";                 // e.g. "Nov 13, 2026"
+const LAST_UPDATED = "Nov 4, 2026 (data: Oct 27 – Nov 2, pre-challenge)";                 // e.g. "Nov 13, 2026"
 const SAMPLE_REQUEST_URL = "#";          // paste sample request link
 const COMMUNITY_URL = "#";               // paste community link
-// One row per creator: handle (no @) and settled orders
-const DATA = [
-  // {handle:"creatorname", orders:12},
-];
+// One row per creator: handle (no @), orders, videos posted
+const DATA = [{"handle":"crazycurls81","orders":0,"videos":1},{"handle":"antaylor328","orders":0,"videos":1},{"handle":"yofav.dreadhead","orders":0,"videos":1},{"handle":"valleymoms","orders":0,"videos":1},{"handle":"imjustiktokn","orders":0,"videos":1},{"handle":"amber.1990","orders":0,"videos":1},{"handle":"lizziebodizzie","orders":0,"videos":1},{"handle":"brooklongdavidson","orders":0,"videos":1},{"handle":"perfectlife2509","orders":0,"videos":2},{"handle":"yulietsy.roque.leiva","orders":0,"videos":1},{"handle":"welcome_ish","orders":0,"videos":1},{"handle":"motivatedbymeliss","orders":0,"videos":1},{"handle":"oliviaoslay","orders":0,"videos":1},{"handle":"mikefromctown","orders":0,"videos":2},{"handle":"ashnichole9918","orders":0,"videos":2},{"handle":"annmeckhart","orders":0,"videos":1},{"handle":"harleydanielles","orders":0,"videos":1},{"handle":"makemefamoussoicanretire","orders":0,"videos":1},{"handle":"faby_aguilar19","orders":0,"videos":1},{"handle":"brittanysrealreviews","orders":0,"videos":1},{"handle":"selenee303","orders":0,"videos":1},{"handle":"boldnorth_flips","orders":0,"videos":1},{"handle":"duranfinds","orders":0,"videos":1},{"handle":"baybeehjay","orders":0,"videos":1},{"handle":"yuluvkayla__","orders":0,"videos":1},{"handle":"funfinds47","orders":0,"videos":2},{"handle":"amberdawnmademebuyit","orders":0,"videos":1},{"handle":"therealjohnartzberger","orders":0,"videos":1},{"handle":"fluidheart_recovery","orders":0,"videos":1},{"handle":"lexilehmann07","orders":0,"videos":1},{"handle":"millennialmomtiktokfinds","orders":0,"videos":1},{"handle":"get.polished_press.on","orders":0,"videos":1},{"handle":"justru444","orders":0,"videos":1},{"handle":"moosehavenllamas","orders":0,"videos":1},{"handle":"mamasamandthechaos","orders":0,"videos":1},{"handle":"partywitjadaaa","orders":0,"videos":1},{"handle":"lifethroughemma","orders":0,"videos":1},{"handle":"allyssiarosey","orders":0,"videos":1},{"handle":"panthers.backup","orders":0,"videos":2}];
 /* ================================================= */
 
 const TIERS = [
@@ -199,9 +197,9 @@ const TIERS = [
 const START = new Date(2026,10,11,0,0,0), END = new Date(2026,11,1,0,0,0);
 const demo = new URLSearchParams(location.search).has("demo");
 const rows = (demo ? [
-  {handle:"sample_creator_a",orders:23},{handle:"sample_creator_b",orders:16},{handle:"sample_creator_c",orders:11},
-  {handle:"sample_creator_d",orders:7},{handle:"sample_creator_e",orders:3},{handle:"sample_creator_f",orders:1}
-] : DATA).map(r=>({handle:String(r.handle).replace(/^@/,""),orders:+r.orders||0})).sort((a,b)=>b.orders-a.orders);
+  {handle:"sample_creator_a",orders:23,videos:5},{handle:"sample_creator_b",orders:16,videos:4},{handle:"sample_creator_c",orders:11,videos:3},
+  {handle:"sample_creator_d",orders:7,videos:2},{handle:"sample_creator_e",orders:3,videos:2},{handle:"sample_creator_f",orders:1,videos:1}
+] : DATA).map(r=>({handle:String(r.handle).replace(/^@/,""),orders:+r.orders||0,videos:+r.videos||0})).sort((a,b)=>b.orders-a.orders);
 if(demo) document.getElementById("demoBar").hidden=false;
 
 const tierOf = o => TIERS.find(t=>o>=t.min)||null;
@@ -237,12 +235,13 @@ $("qCount").textContent=qualifying;
 
 // leaderboard
 const bb=$("boardBody");
-if(!rows.length){
-  bb.innerHTML='<div class="empty">The leaderboard goes live once the challenge starts on Nov 11. Check back soon.</div>';
+const board=rows.filter(r=>r.orders>0);
+if(!board.length){
+  bb.innerHTML='<div class="empty">No settled orders yet. Creators who have posted can look themselves up in "find your progress" above. The leaderboard fills in as orders come in.</div>';
 }else{
   const t=document.createElement("table");
   t.innerHTML="<thead><tr><th>#</th><th>Creator</th><th>Orders</th><th>Tier</th></tr></thead><tbody></tbody>";
-  rows.forEach((r,i)=>{
+  board.forEach((r,i)=>{
     const tr=document.createElement("tr"), ti=tierOf(r.orders);
     const a=document.createElement("td");a.className="rk";a.textContent=i+1;
     const b=document.createElement("td");b.textContent="@"+r.handle;b.style.fontWeight=700;
@@ -268,8 +267,8 @@ $("f").addEventListener("submit",e=>{
     const r=rows[i], ti=tierOf(r.orders), next=[...TIERS].reverse().find(t=>r.orders<t.min);
     const base=next?next.min:TIERS[0].min, pct=Math.min(100,r.orders/base*100);
     box.innerHTML='<h3></h3><div class="badge"></div><div class="bar"><div></div></div><div class="msg"></div>';
-    box.children[0].textContent="@"+r.handle+" · "+r.orders+" settled orders · rank #"+(i+1);
-    box.children[1].textContent=ti?"Current tier: $"+ti.reward:"Not yet at 3 orders";
+    box.children[0].textContent="@"+r.handle+" · "+r.orders+" orders · "+r.videos+" video"+(r.videos===1?"":"s")+" posted"+(r.orders>0?" · rank #"+(i+1):"");
+    box.children[1].textContent=ti?"Current tier: $"+ti.reward:(r.orders>0?"Not yet at 3 orders":"You're on the list. No orders yet.");
     if(!ti) box.children[1].className="badge none";
     box.querySelector(".bar div").style.width=pct+"%";
     box.querySelector(".msg").textContent=next?(next.min-r.orders)+" more settled orders to reach the $"+next.reward+" tier.":"You're at the top tier. Nice work!";
